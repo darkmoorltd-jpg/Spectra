@@ -1,3 +1,4 @@
+
 import streamlit as st
 
 st.set_page_config(page_title="SPECTRA", page_icon="⛏️", layout="wide")
@@ -14,6 +15,12 @@ st.info("""
 
 👉 Use the **Scan Mineral** page to start.
 """)
+
+# Quick stats (demo)
+col1, col2, col3 = st.columns(3)
+col1.metric("Minerals Recognized", "10+")
+col2.metric("Scan Cost", "₦300")
+col3.metric("Countries Served", "Nigeria (beta)")
 
 st.markdown("---")
 st.caption("Powered by Darkmoor Ltd")
