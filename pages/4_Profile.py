@@ -1,19 +1,17 @@
 
 import streamlit as st
+from utils.auth import get_current_user
 
 st.set_page_config(page_title="Profile", page_icon="👤", layout="wide")
 
 st.title("👤 My Profile")
-st.markdown("Manage your account and preferences.")
-
-if "user" not in st.session_state or st.session_state.user is None:
+user = get_current_user()
+if user is None:
     st.warning("Please log in first.")
 else:
-    user = st.session_state.user
     st.write(f"**Email:** {user.email}")
     st.write(f"**User ID:** {user.id}")
-
-    # Placeholder form (connect to Supabase user_profiles later)
+    # Placeholder form (update later with Supabase)
     with st.form("profile_form"):
         first_name = st.text_input("First Name")
         last_name = st.text_input("Last Name")
