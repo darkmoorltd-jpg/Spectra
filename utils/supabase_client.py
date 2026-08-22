@@ -5,7 +5,7 @@ from supabase import create_client, Client
 def get_supabase() -> Client:
     """Return Supabase client using anon key from secrets."""
     url = st.secrets["supabase"]["url"]
-    key = st.secrets["supabase"]["anon_key"]
+    key = st.secrets["supabase"]["key"]
     return create_client(url, key)
 
 def get_service_client() -> Client:
@@ -35,3 +35,23 @@ def deduct_scan(user_id: str, amount: int = 1) -> int:
     new_total = max(0, current - amount)
     client.table("user_scans").update({"scans_remaining": new_total}).eq("user_id", user_id).execute()
     return new_total
+
+def add_scans_to_user(user_id: str, amount: int) -> int:
+    """Add scans to user account and return new total."""
+    client = get_supabase()
+    current = get_user_scans(user_id)
+    new_total = current + amount
+    client.table("user_scans").update({"scans_remaining": new_total}).eq("user_id", user_id).execute()
+    return new_total
+
+def save_payment_record(user_id: str, amount: float, scans_added: int, plan: str, reference: str):
+    """Insert payment history row."""
+    client = get_supabase()
+    client.table("payment_history").insert({
+        "user_id": user_id,
+        "amount": amount,
+        "scans_added": scans_added,
+        "plan": plan,
+        "reference": reference,
+        "paid_at": "now()"
+    }).execute()
