@@ -5,3 +5,8 @@ numpy
 python-dotenv
 requests
 plotly
+reportlab
+opencv-python-headless
+folium
+streamlit-folium
+geopy

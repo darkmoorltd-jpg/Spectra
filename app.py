@@ -3,6 +3,7 @@ import streamlit as st
 from utils.style import apply_global_style, metric_box
 from utils.auth import sign_up, sign_in, sign_out, get_current_user
 from utils.constants import MINERALS
+from utils.gamification import update_streak, get_leaderboard
 
 st.set_page_config(page_title="SPECTRA", page_icon="⛏️", layout="wide")
 apply_global_style()
@@ -57,10 +58,25 @@ with st.sidebar:
 st.markdown('<div class="hero-title">SPECTRA</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">GEOLOGIST IN YOUR POCKET</div>', unsafe_allow_html=True)
 
+# Live Price Ticker (scrolling marquee)
 st.markdown("""
-<div style="text-align:center; margin: 2rem 0;">
-    <span style="font-size:1.2rem; color:#8892b0;">Know what you've found. Get its grade. Get fair market value.</span>
+<div class="ticker-wrap" style="background:#111827; border:1px solid #1f2a44; border-radius:8px; padding:10px 0; margin:10px 0; overflow:hidden;">
+    <div class="ticker" style="display:flex; animation: scroll 15s linear infinite; white-space:nowrap;">
+        <span style="padding:0 20px; color:#ffd700;">Gold: $65,000/kg</span>
+        <span style="padding:0 20px; color:#b87333;">Copper: $8,500/ton</span>
+        <span style="padding:0 20px; color:#00e5ff;">Quartz: $500/ton</span>
+        <span style="padding:0 20px; color:#00c853;">Malachite: $20,000/ton</span>
+        <span style="padding:0 20px; color:#ffd700;">Bornite: $15,000/ton</span>
+        <span style="padding:0 20px; color:#ffd700;">Gold: $65,000/kg</span>
+        <span style="padding:0 20px; color:#b87333;">Copper: $8,500/ton</span>
+    </div>
 </div>
+<style>
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+</style>
 """, unsafe_allow_html=True)
 
 # Quick Stats
@@ -73,6 +89,11 @@ with col3:
     metric_box("24/7", "Offline Ready")
 with col4:
     metric_box("NGN/USD", "Live Prices")
+
+# Show streak if logged in
+if user:
+    streak = update_streak(user.id)
+    st.markdown(f"🔥 Streak: **{streak} days**")
 
 st.markdown("---")
 
@@ -92,11 +113,19 @@ with col1:
 with col2:
     st.page_link("pages/4_Profile.py", label="👤 Profile", use_container_width=True)
 
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.page_link("pages/7_Mineralpedia.py", label="📚 Mineralpedia", use_container_width=True)
+with col2:
+    st.page_link("pages/8_Leaderboard.py", label="🏆 Leaderboard", use_container_width=True)
+with col3:
+    st.page_link("pages/9_Referral.py", label="🔗 Referral", use_container_width=True)
+
 # Gamification Preview
 st.markdown("---")
 st.subheader("🏆 Your Achievements")
 if user:
-    # Placeholder for badges from Supabase
+    # Placeholder for badges
     st.markdown('<span class="badge">🔬 First Scan</span>', unsafe_allow_html=True)
     st.markdown('<span class="badge">🥇 Gold Hunter</span>', unsafe_allow_html=True)
 else:
