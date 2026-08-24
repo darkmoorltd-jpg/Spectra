@@ -1,8 +1,10 @@
 
 import streamlit as st
+from utils.style import apply_global_style
 from utils.auth import get_current_user
 
 st.set_page_config(page_title="Profile", page_icon="👤", layout="wide")
+apply_global_style()
 
 st.title("👤 My Profile")
 user = get_current_user()
@@ -11,7 +13,6 @@ if user is None:
 else:
     st.write(f"**Email:** {user.email}")
     st.write(f"**User ID:** {user.id}")
-    # Placeholder form (update later with Supabase)
     with st.form("profile_form"):
         first_name = st.text_input("First Name")
         last_name = st.text_input("Last Name")
