@@ -10,3 +10,7 @@ opencv-python-headless
 folium
 streamlit-folium
 geopy
+qrcode
+librosa
+sounddevice
+streamlit-webrtc

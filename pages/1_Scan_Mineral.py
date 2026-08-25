@@ -16,13 +16,14 @@ from utils.supabase_client import deduct_scan
 from utils.constants import MINERALS, MINERAL_PRICES
 from utils.voice import transcribe_audio
 from utils.pdf_report import generate_pdf_report
+from utils.extra_features import generate_qr_code, generate_blockchain_hash, overlay_heatmap, process_video_frames, record_scratch_sound, analyze_sound
 
 st.set_page_config(page_title="Scan Mineral", page_icon="🔍", layout="wide")
 apply_global_style()
 
 st.markdown('<h2 style="text-align:center;">🔍 Mineral Scanner</h2>', unsafe_allow_html=True)
 
-# Voice command button
+# Voice command
 if st.button("🎤 Voice Command"):
     audio = st.audio_input("Speak now")
     if audio:
@@ -32,20 +33,37 @@ if st.button("🎤 Voice Command"):
             st.error(err)
         else:
             st.success(f"You said: {text}")
-            # If text contains "scan" or "identify", trigger file upload prompt
             if any(word in text.lower() for word in ["scan", "identify", "what is"]):
                 st.info("Please upload a photo or use camera.")
 
-# Input method
-option = st.radio("Input Method", ["Upload Photo", "Use Camera"], horizontal=True)
+# Input method: Upload, Camera, or Video
+option = st.radio("Input Method", ["Upload Photo", "Use Camera", "Upload Video"], horizontal=True)
+image_file = None
+video_file = None
+
 if option == "Use Camera":
     image_file = st.camera_input("Take a photo of the mineral")
-else:
+elif option == "Upload Photo":
     image_file = st.file_uploader("Upload a photo", type=["jpg","jpeg","png"])
+else:
+    video_file = st.file_uploader("Upload a video", type=["mp4","mov","avi"])
 
 if image_file is not None:
     image = Image.open(image_file).convert("RGB")
     st.image(image, caption="Your sample", width=400)
+
+    # Scratch sound test option
+    use_sound = st.checkbox("Add Scratch Test (record sound)", value=False)
+    sound_features = None
+    if use_sound:
+        if st.button("Record Scratch"):
+            with st.spinner("Recording 3 seconds..."):
+                recording, fs = record_scratch_sound()
+            st.success("Recording done!")
+            # Analyze
+            centroid, std = analyze_sound(recording, fs)
+            st.write(f"Spectral Centroid: {centroid:.2f} Hz, Std: {std:.2f}")
+            sound_features = (centroid, std)
 
     if st.button("Identify Mineral", type="primary"):
         user = st.session_state.get("user", None)
@@ -75,6 +93,10 @@ if image_file is not None:
                 my_bar.progress(percent)
             my_bar.progress(100)
 
+        # Heatmap overlay
+        heatmap_img = overlay_heatmap(image, grade, mineral)
+        st.image(heatmap_img, caption="Mineral Distribution Heatmap", use_container_width=True)
+
         # Result display
         st.markdown("---")
         st.markdown("## 🧪 Analysis Result")
@@ -98,7 +120,7 @@ if image_file is not None:
                               font=dict(color='#e0e0e0'))
             st.plotly_chart(fig, use_container_width=True)
 
-            # 3D viewer placeholder (using rotating emoji)
+            # 3D viewer placeholder
             st.markdown(f'<div style="text-align:center;"><span style="font-size:4rem;">💎</span><br><small>3D Viewer coming soon</small></div>', unsafe_allow_html=True)
 
         with col2:
@@ -113,33 +135,57 @@ if image_file is not None:
             insight = get_market_insight(mineral, grade, value_ngn)
             st.write(insight)
 
-        # Chat about mineral
+        # Chat
         st.markdown("---")
         st.subheader("🤖 Ask the Geologist")
         user_question = st.text_input("Ask a question about this mineral", key="chat_input")
         if user_question:
-            from utils.deepseek import get_market_insight
-            response = get_market_insight(mineral, grade, value_ngn)  # reuse for demo
+            response = get_market_insight(mineral, grade, value_ngn)  # reuse
             st.write(response)
 
-        # Action buttons
+        # Blockchain verification
+        scan_id = str(uuid.uuid4())[:8]
+        scan_data = f"{mineral}|{confidence}|{grade}|{value_ngn}|{scan_id}"
+        hash_val = generate_blockchain_hash(scan_data)
+        qr_data = f"SPECTRA_VERIFY:{hash_val}"
+        qr_b64 = generate_qr_code(qr_data)
+
         st.markdown("---")
+        st.subheader("🔗 Verification")
+        col1, col2 = st.columns([1, 2])
+        with col1:
+            st.image(base64.b64decode(qr_b64), width=100)
+        with col2:
+            st.markdown(f"**SHA‑256 Hash:** `{hash_val[:20]}...`")
+            st.markdown(f"**Scan ID:** {scan_id}")
+
+        # Action buttons
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             if st.button("Save to Vault"):
-                # TODO: Save to Supabase
+                # TODO: Save to Supabase scan_history
                 st.success("Saved!")
         with col2:
             if st.button("Find Buyers"):
-                st.info("Buyer map will be integrated soon.")
+                st.info("Go to Buyer Matching page.")
         with col3:
             if st.button("Voice Explanation"):
-                # Placeholder for TTS
+                # Placeholder TTS
                 st.audio(b"", format="audio/mp3")
         with col4:
             if st.button("Download PDF Report"):
-                scan_id = str(uuid.uuid4())[:8]
                 pdf_bytes = generate_pdf_report(mineral, confidence, grade, value_ngn, image_file.getvalue(), scan_id)
                 b64 = base64.b64encode(pdf_bytes).decode()
                 href = f'<a href="data:application/pdf;base64,{b64}" download="SPECTRA_report_{mineral}_{scan_id}.pdf">📄 Download PDF</a>'
                 st.markdown(href, unsafe_allow_html=True)
+
+elif video_file is not None:
+    st.video(video_file)
+    if st.button("Analyze Video"):
+        frames = process_video_frames(video_file, num_frames=5)
+        st.success(f"Extracted {len(frames)} frames")
+        for i, frame in enumerate(frames):
+            st.image(frame, caption=f"Frame {i+1}", width=200)
+        # Aggregate results (demo)
+        mineral = random.choice(MINERALS)
+        st.markdown(f"Most likely mineral: **{mineral}**")
