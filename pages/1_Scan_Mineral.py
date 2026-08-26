@@ -15,6 +15,7 @@ from utils.supabase_client import deduct_scan
 from utils.constants import MINERALS, MINERAL_PRICES
 from utils.voice import transcribe_audio
 from utils.pdf_report import generate_pdf_report
+from utils.threejs_viewer import render_3d_mineral
 from utils.extra_features import generate_qr_code, generate_blockchain_hash, overlay_heatmap, process_video_frames, record_scratch_sound, analyze_sound
 
 st.set_page_config(page_title="Scan Mineral", page_icon="🔍", layout="wide")
@@ -141,7 +142,7 @@ if image_file is not None:
                               font=dict(color='#e0e0e0'))
             st.plotly_chart(fig, use_container_width=True)
 
-            st.markdown(f'<div style="text-align:center;"><span style="font-size:4rem;">💎</span><br><small>3D Viewer coming soon</small></div>', unsafe_allow_html=True)
+            render_3d_mineral(mineral)
 
         with col2:
             st.markdown(f'<h1 style="color:#ffd700; font-size:3rem;">{mineral}</h1>', unsafe_allow_html=True)
