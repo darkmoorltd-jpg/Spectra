@@ -63,18 +63,34 @@ def process_video_frames(video_file, num_frames=5):
     return frames
 
 def record_scratch_sound(duration=3):
-    """Record audio from microphone for scratch test."""
-    import sounddevice as sd
-    fs = 44100
-    recording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
-    sd.wait()
-    return recording.flatten(), fs
+    """Record audio from microphone for scratch test.
+    Returns (None, None) if sounddevice is unavailable."""
+    try:
+        import sounddevice as sd
+    except Exception as e:
+        print(f"sounddevice not available: {e}")
+        return None, None
+    try:
+        fs = 44100
+        recording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
+        sd.wait()
+        return recording.flatten(), fs
+    except Exception as e:
+        print(f"Recording failed: {e}")
+        return None, None
 
 def analyze_sound(recording, fs):
-    """Extract frequency features from scratch sound."""
-    import librosa
-    # Ensure float32
-    y = recording.astype(np.float32)
-    # Compute spectral centroid
-    cent = librosa.feature.spectral_centroid(y=y, sr=fs)
-    return np.mean(cent), np.std(cent)
+    """Extract frequency features from scratch sound.
+    Returns (None, None) if librosa or sound unavailable."""
+    if recording is None or fs is None:
+        return None, None
+    try:
+        import librosa
+        # Ensure float32
+        y = recording.astype(np.float32)
+        # Compute spectral centroid
+        cent = librosa.feature.spectral_centroid(y=y, sr=fs)
+        return np.mean(cent), np.std(cent)
+    except Exception as e:
+        print(f"Sound analysis failed: {e}")
+        return None, None
