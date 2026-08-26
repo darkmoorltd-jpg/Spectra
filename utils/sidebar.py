@@ -3,12 +3,11 @@ import streamlit as st
 from utils.auth import sign_up, sign_in, sign_out, get_current_user
 
 def render_sidebar():
-    """Render the common sidebar for all pages."""
     with st.sidebar:
         st.markdown("## 🔐 Account")
         user = get_current_user()
         if user is None:
-            auth_choice = st.radio("Login / Signup", ["Login", "Signup"])
+            auth_choice = st.radio("Login / Signup", ["Login", "Signup"], key="sidebar_auth_choice")
             email = st.text_input("Email", key="sidebar_email")
             password = st.text_input("Password", type="password", key="sidebar_password")
             if auth_choice == "Signup":
@@ -47,30 +46,26 @@ def render_sidebar():
 
         st.markdown("---")
         st.markdown("### 🚀 Quick Navigation")
-        # Use page_link for navigation
+        # Use markdown links instead of st.page_link for better compatibility
         pages = [
-            ("app.py", "🏠 Home"),
-            ("pages/1_Scan_Mineral.py", "🔍 Scan Mineral"),
-            ("pages/2_My_History.py", "📊 My Vault"),
-            ("pages/6_Market.py", "💹 Market Prices"),
-            ("pages/3_Buy_Scans.py", "💳 Buy Scans"),
-            ("pages/4_Profile.py", "👤 Profile"),
-            ("pages/7_Mineralpedia.py", "📚 Mineralpedia"),
-            ("pages/8_Leaderboard.py", "🏆 Leaderboard"),
-            ("pages/9_Referral.py", "🔗 Referral"),
-            ("pages/10_Profit_Simulator.py", "💰 Profit Simulator"),
-            ("pages/11_Buyer_Matching.py", "🤝 Find Buyers"),
-            ("pages/12_Price_Alerts.py", "🔔 Price Alerts"),
-            ("pages/13_Multi_Scan_Compare.py", "📈 Compare Scans"),
-            ("pages/14_Exploration_Map.py", "🗺️ Exploration Map"),
-            ("pages/15_Find_of_the_Day.py", "⭐ Find of the Day"),
-            ("pages/16_Mining_License.py", "📜 License Guide"),
-            ("pages/17_Real_Time_Video.py", "🎥 Real‑Time Video"),
-            ("pages/18_Sound_Analysis.py", "🔊 Sound Analysis"),
+            ("🏠 Home", "/"),
+            ("🔍 Scan Mineral", "/Scan_Mineral"),
+            ("📊 My Vault", "/My_History"),
+            ("💹 Market Prices", "/Market"),
+            ("💳 Buy Scans", "/Buy_Scans"),
+            ("👤 Profile", "/Profile"),
+            ("📚 Mineralpedia", "/Mineralpedia"),
+            ("🏆 Leaderboard", "/Leaderboard"),
+            ("🔗 Referral", "/Referral"),
+            ("💰 Profit Simulator", "/Profit_Simulator"),
+            ("🤝 Find Buyers", "/Buyer_Matching"),
+            ("🔔 Price Alerts", "/Price_Alerts"),
+            ("📈 Compare Scans", "/Multi_Scan_Compare"),
+            ("🗺️ Exploration Map", "/Exploration_Map"),
+            ("⭐ Find of the Day", "/Find_of_the_Day"),
+            ("📜 License Guide", "/Mining_License"),
+            ("🎥 Real‑Time Video", "/Real_Time_Video"),
+            ("🔊 Sound Analysis", "/Sound_Analysis"),
         ]
-        for path, label in pages:
-            # Convert path to Streamlit page link format
-            if path == "app.py":
-                st.page_link("app.py", label=label, use_container_width=True)
-            else:
-                st.page_link(path, label=label, use_container_width=True)
+        for label, path in pages:
+            st.markdown(f"[{label}]({path})")
