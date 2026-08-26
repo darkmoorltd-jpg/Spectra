@@ -1,18 +1,18 @@
-from utils.sidebar import render_sidebar
 
 import streamlit as st
 import streamlit.components.v1 as components
 import uuid
 from utils.style import apply_global_style
+from utils.sidebar import render_sidebar
 from utils.auth import get_current_user
 from utils.paystack import PAYSTACK_PUBLIC_KEY
 
 st.set_page_config(page_title="Buy Scans", page_icon="💳", layout="wide")
-render_sidebar()
 apply_global_style()
+render_sidebar()
 
 st.markdown('<h2 style="text-align:center;">💳 Buy Scans</h2>', unsafe_allow_html=True)
-st.markdown('<p style="text-align:center; color:#8892b0;">Choose a plan and power up your mining</p>', unsafe_allow_html=True)
+st.markdown('<p style="text-align:center; color:#8892b0;">Choose a scan pack and power up your mining</p>', unsafe_allow_html=True)
 
 user = get_current_user()
 if user is None:
@@ -20,10 +20,8 @@ if user is None:
     st.stop()
 
 PLANS = {
-    "10": {"scans": 10, "price": "₦500", "kobo": 50000},
-    "25": {"scans": 25, "price": "₦1,000", "kobo": 100000},
-    "60": {"scans": 60, "price": "₦2,000", "kobo": 200000},
-    "unlimited": {"scans": 9999, "price": "₦2,000/month", "kobo": 200000},
+    "100": {"scans": 100, "price": "₦25,000", "kobo": 2500000},
+    "300": {"scans": 300, "price": "₦50,000", "kobo": 5000000},
 }
 
 cols = st.columns(len(PLANS))
