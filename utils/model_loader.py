@@ -11,7 +11,6 @@ MODEL_URL = "https://github.com/darkmoorltd-jpg/Spectra/releases/download/v1.0-3
 MODEL_PATH = "models/open_set_mineral_model_384.pt"
 
 def ensure_model():
-    """Download the model if not present or too small."""
     if not os.path.exists(MODEL_PATH) or os.path.getsize(MODEL_PATH) < 10_000_000:
         os.makedirs("models", exist_ok=True)
         print(f"Downloading model from {MODEL_URL} ...")
@@ -28,7 +27,6 @@ def ensure_model():
 
 @torch.no_grad()
 def load_mineral_model():
-    """Load model, prototypes, threshold, class_names, img_size."""
     try:
         path = ensure_model()
         checkpoint = torch.load(path, map_location="cpu", weights_only=False)
@@ -58,7 +56,6 @@ def load_mineral_model():
         return None
 
 def predict_mineral(model_dict, image: Image.Image):
-    """Run open-set inference. Returns (mineral_name, confidence, grade)."""
     if model_dict is None:
         return "Unknown", 0.0, 0.0
 
