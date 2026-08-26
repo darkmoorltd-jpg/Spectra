@@ -14,3 +14,6 @@ qrcode
 librosa
 sounddevice
 streamlit-webrtc
+torch
+torchvision
+timm
