@@ -74,18 +74,19 @@ with st.form("profile_form"):
         govt_id_number = st.text_input("ID Number", value=get_val("govt_id_number"))
 
     st.markdown("---")
-    st.markdown("## 🌾 Farm Information")
+    st.markdown("## ⛏️ Mining Information")
     col1, col2, col3 = st.columns(3)
     with col1:
-        farm_state = st.text_input("Farm State", value=get_val("farm_state"))
-        farm_size = st.number_input("Farm Size (acres)", min_value=0.0, value=float(get_val("farm_size_acres", 1.0)))
-        farming_type = st.selectbox("Farming Type", ["", "Smallholder (< 1 acre)", "Medium (1-10 acres)", "Commercial (10-50 acres)", "Industrial (50+ acres)"], index=0 if not get_val("farming_type") else ["", "Smallholder (< 1 acre)", "Medium (1-10 acres)", "Commercial (10-50 acres)", "Industrial (50+ acres)"].index(get_val("farming_type")))
+        mining_state = st.text_input("Mining State", value=get_val("mining_state"))
+        mining_lga = st.text_input("Mining LGA", value=get_val("mining_lga"))
+        mining_address = st.text_input("Mining Address", value=get_val("mining_address"))
     with col2:
-        farm_lga = st.text_input("Farm LGA", value=get_val("farm_lga"))
-        years_exp = st.number_input("Years of Experience", min_value=0, value=int(get_val("years_experience", 0)))
-        primary_crops = st.text_input("Primary Crops", value=get_val("primary_crops"))
+        minerals_of_interest = st.text_input("Minerals of Interest", value=get_val("minerals_of_interest"))
+        years_mining_experience = st.number_input("Years of Mining Experience", min_value=0, value=int(get_val("years_mining_experience", 0)))
+        mining_license_number = st.text_input("Mining License Number", value=get_val("mining_license_number"))
     with col3:
-        farm_address = st.text_input("Farm Address", value=get_val("farm_address"))
+        mining_cooperative = st.text_input("Mining Cooperative", value=get_val("mining_cooperative"))
+        mining_type = st.selectbox("Mining Type", ["", "Artisanal", "Small-scale", "Medium-scale", "Large-scale"], index=0 if not get_val("mining_type") else ["", "Artisanal", "Small-scale", "Medium-scale", "Large-scale"].index(get_val("mining_type")))
 
     st.markdown("---")
     st.markdown("## 🏦 Bank Information")
@@ -142,13 +143,14 @@ if submitted:
             "nin": nin.strip() if nin else None,
             "govt_id_type": govt_id_type if govt_id_type else None,
             "govt_id_number": govt_id_number.strip() if govt_id_number else None,
-            "farm_state": farm_state.strip() if farm_state else None,
-            "farm_lga": farm_lga.strip() if farm_lga else None,
-            "farm_address": farm_address.strip() if farm_address else None,
-            "farm_size_acres": farm_size,
-            "years_experience": years_exp,
-            "primary_crops": primary_crops.strip() if primary_crops else None,
-            "farming_type": farming_type if farming_type else None,
+            "mining_state": mining_state.strip() if mining_state else None,
+            "mining_lga": mining_lga.strip() if mining_lga else None,
+            "mining_address": mining_address.strip() if mining_address else None,
+            "minerals_of_interest": minerals_of_interest.strip() if minerals_of_interest else None,
+            "years_mining_experience": years_mining_experience,
+            "mining_license_number": mining_license_number.strip() if mining_license_number else None,
+            "mining_cooperative": mining_cooperative.strip() if mining_cooperative else None,
+            "mining_type": mining_type if mining_type else None,
             "account_name": account_name.strip() if account_name else None,
             "account_number": account_number.strip() if account_number else None,
             "bank_name": bank_name if bank_name else None,
