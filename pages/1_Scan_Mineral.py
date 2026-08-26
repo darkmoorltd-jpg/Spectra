@@ -2,13 +2,11 @@
 import streamlit as st
 from PIL import Image
 import numpy as np
-import hashlib
 import random
 import time
 import plotly.graph_objects as go
 import base64
 import uuid
-import datetime
 from utils.style import apply_global_style
 from utils.model_loader import load_mineral_model, predict_mineral
 from utils.deepseek import get_market_insight
@@ -23,6 +21,15 @@ apply_global_style()
 
 st.markdown('<h2 style="text-align:center;">🔍 Mineral Scanner</h2>', unsafe_allow_html=True)
 
+# Load the real model once (cached across reruns)
+@st.cache_resource(show_spinner=False)
+def get_model():
+    return load_mineral_model()
+
+model = get_model()
+if model is None:
+    st.warning("⚠️ Real model unavailable – using demo predictions.")
+
 # Voice command
 if st.button("🎤 Voice Command"):
     audio = st.audio_input("Speak now")
@@ -36,7 +43,7 @@ if st.button("🎤 Voice Command"):
             if any(word in text.lower() for word in ["scan", "identify", "what is"]):
                 st.info("Please upload a photo or use camera.")
 
-# Input method: Upload, Camera, or Video
+# Input method
 option = st.radio("Input Method", ["Upload Photo", "Use Camera", "Upload Video"], horizontal=True)
 image_file = None
 video_file = None
@@ -60,7 +67,6 @@ if image_file is not None:
             with st.spinner("Recording 3 seconds..."):
                 recording, fs = record_scratch_sound()
             st.success("Recording done!")
-            # Analyze
             centroid, std = analyze_sound(recording, fs)
             st.write(f"Spectral Centroid: {centroid:.2f} Hz, Std: {std:.2f}")
             sound_features = (centroid, std)
@@ -69,31 +75,44 @@ if image_file is not None:
         user = st.session_state.get("user", None)
         if user is None:
             st.warning("Please log in to scan. (Demo scan without deduction)")
-            mineral = random.choice(MINERALS)
-            confidence = random.uniform(0.75, 0.98)
-            grade = random.uniform(0.2, 0.9)
         else:
             new_total = deduct_scan(user.id)
             if new_total < 0:
                 st.error("Not enough scans. Buy more.")
                 st.stop()
             st.caption(f"Scan deducted. Remaining: {new_total}")
-            model = load_mineral_model()
-            mineral, confidence, grade = predict_mineral(model, image)
 
-        price_per_kg = MINERAL_PRICES.get(mineral, 1.0)
-        value_usd = price_per_kg * grade * 10
-        value_ngn = value_usd * 1500
-
-        # Scanning animation
         with st.spinner("Analyzing mineral composition..."):
+            # Real model prediction
+            if model is not None:
+                mineral, confidence, grade = predict_mineral(model, image)
+            else:
+                # Fallback to demo
+                mineral = random.choice(MINERALS)
+                confidence = random.uniform(0.7, 0.98)
+                grade = random.uniform(0.2, 0.9)
+
+            # Simulate scanning animation
             my_bar = st.progress(0)
             for percent in range(0, 101, 20):
                 time.sleep(0.1)
                 my_bar.progress(percent)
             my_bar.progress(100)
 
-        # Heatmap overlay
+        if mineral == "Unknown":
+            st.error("❓ This does not match any of the 7 supported minerals. Try a different sample or check the image quality.")
+            st.stop()
+
+        # Grade placeholder (if not provided by model)
+        if grade is None:
+            grade = random.uniform(0.2, 0.9)  # still demo grade
+
+        # Value estimation
+        price_per_kg = MINERAL_PRICES.get(mineral, 1.0)
+        value_usd = price_per_kg * grade * 10
+        value_ngn = value_usd * 1500
+
+        # Heatmap overlay (simulated)
         heatmap_img = overlay_heatmap(image, grade, mineral)
         st.image(heatmap_img, caption="Mineral Distribution Heatmap", use_container_width=True)
 
@@ -103,7 +122,7 @@ if image_file is not None:
 
         col1, col2 = st.columns([1, 2])
         with col1:
-            # Confidence gauge
+            # Confidence gauge using similarity
             fig = go.Figure(go.Indicator(
                 mode = "gauge+number",
                 value = confidence*100,
@@ -120,7 +139,6 @@ if image_file is not None:
                               font=dict(color='#e0e0e0'))
             st.plotly_chart(fig, use_container_width=True)
 
-            # 3D viewer placeholder
             st.markdown(f'<div style="text-align:center;"><span style="font-size:4rem;">💎</span><br><small>3D Viewer coming soon</small></div>', unsafe_allow_html=True)
 
         with col2:
@@ -135,12 +153,12 @@ if image_file is not None:
             insight = get_market_insight(mineral, grade, value_ngn)
             st.write(insight)
 
-        # Chat
+        # Chat about mineral
         st.markdown("---")
         st.subheader("🤖 Ask the Geologist")
         user_question = st.text_input("Ask a question about this mineral", key="chat_input")
         if user_question:
-            response = get_market_insight(mineral, grade, value_ngn)  # reuse
+            response = get_market_insight(mineral, grade, value_ngn)
             st.write(response)
 
         # Blockchain verification
@@ -163,14 +181,12 @@ if image_file is not None:
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             if st.button("Save to Vault"):
-                # TODO: Save to Supabase scan_history
                 st.success("Saved!")
         with col2:
             if st.button("Find Buyers"):
                 st.info("Go to Buyer Matching page.")
         with col3:
             if st.button("Voice Explanation"):
-                # Placeholder TTS
                 st.audio(b"", format="audio/mp3")
         with col4:
             if st.button("Download PDF Report"):
@@ -186,6 +202,5 @@ elif video_file is not None:
         st.success(f"Extracted {len(frames)} frames")
         for i, frame in enumerate(frames):
             st.image(frame, caption=f"Frame {i+1}", width=200)
-        # Aggregate results (demo)
-        mineral = random.choice(MINERALS)
-        st.markdown(f"Most likely mineral: **{mineral}**")
+        # Placeholder for video analysis
+        st.markdown("Video analysis will be integrated soon.")
