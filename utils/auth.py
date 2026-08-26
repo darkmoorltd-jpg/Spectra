@@ -7,19 +7,25 @@ def get_supabase():
     key = st.secrets["supabase"]["key"]
     return create_client(url, key)
 
+def get_service_client():
+    url = st.secrets["supabase"]["url"]
+    key = st.secrets["supabase"]["service_key"]
+    return create_client(url, key)
+
 def sign_up(email, password, first_name="", last_name=""):
     """Create a new user and initialize scans."""
     client = get_supabase()
     try:
         res = client.auth.sign_up({"email": email, "password": password})
         if res.user:
-            # Insert default scan row and profile
-            client.table("user_scans").insert({
+            # Use service client to insert rows (bypass RLS)
+            service = get_service_client()
+            service.table("user_scans").insert({
                 "user_id": res.user.id,
                 "scans_remaining": 30,
                 "plan": "free"
             }).execute()
-            client.table("user_profiles").insert({
+            service.table("user_profiles").insert({
                 "user_id": res.user.id,
                 "first_name": first_name,
                 "last_name": last_name
