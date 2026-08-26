@@ -109,7 +109,6 @@ def add_scans(user_id, amount):
     if amount <= 0:
         return False, "Amount must be positive"
     try:
-        # Get current scans
         cur_res = service.table("user_scans").select("scans_remaining").eq("user_id", user_id).execute()
         cur = cur_res.data[0]["scans_remaining"] if cur_res.data else 0
         new_total = cur + amount
@@ -133,7 +132,6 @@ def delete_user(user_id):
             service.table(table).delete().eq("user_id", user_id).execute()
         except:
             pass
-    # Delete auth user
     try:
         service.auth.admin.delete_user(user_id)
         return True, "User deleted successfully"
@@ -166,12 +164,10 @@ def create_user(email, password, first_name="", last_name="", phone="", state=""
 def update_kyc(user_id, status):
     """Update KYC status in both farmer_verifications and user_profiles."""
     try:
-        # Update farmer_verifications
         service.table("farmer_verifications").update({"status": status}).eq("user_id", user_id).execute()
     except:
         pass
     try:
-        # Update user_profiles
         service.table("user_profiles").update({"verification_status": status}).eq("user_id", user_id).execute()
     except:
         pass
@@ -243,18 +239,93 @@ with tab2:
             st.write(f"**Joined:** {str(user.get('created_at',''))[:10]}")
             st.write(f"**Phone:** {user.get('phone','N/A')}")
             st.write(f"**WhatsApp:** {user.get('whatsapp','N/A')}")
-            st.write(f"**State:** {user.get('state','N/A')}")
-            st.write(f"**Mining State:** {user.get('mining_state','N/A')}")
-            st.write(f"**Minerals of Interest:** {user.get('minerals_of_interest','N/A')}")
+
+            # -------------------------------------------------
+            # FULL PROFILE DISPLAY
+            # -------------------------------------------------
+            st.markdown("---")
+            st.subheader("📋 Full Profile Information")
+
+            # Personal Information
+            with st.expander("👤 Personal Information", expanded=True):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.write(f"First Name: {user.get('first_name','')}")
+                    st.write(f"Middle Name: {user.get('middle_name','')}")
+                    st.write(f"Last Name: {user.get('last_name','')}")
+                    st.write(f"Gender: {user.get('gender','')}")
+                with col2:
+                    st.write(f"Date of Birth: {str(user.get('date_of_birth',''))[:10]}")
+                    st.write(f"Marital Status: {user.get('marital_status','')}")
+                    st.write(f"Phone: {user.get('phone','')}")
+                    st.write(f"WhatsApp: {user.get('whatsapp','')}")
+                with col3:
+                    st.write(f"Country: {user.get('country','')}")
+                    st.write(f"State: {user.get('state','')}")
+                    st.write(f"LGA: {user.get('lga','')}")
+                    st.write(f"City: {user.get('city','')}")
+                    st.write(f"Street: {user.get('street_address','')}")
+                    st.write(f"Landmark: {user.get('landmark','')}")
+                    st.write(f"Postal Code: {user.get('postal_code','')}")
+
+            # KYC Information
+            with st.expander("🛡️ KYC Information", expanded=False):
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write(f"BVN: {user.get('bvn','')}")
+                    st.write(f"NIN: {user.get('nin','')}")
+                    st.write(f"Govt ID Type: {user.get('govt_id_type','')}")
+                    st.write(f"Govt ID Number: {user.get('govt_id_number','')}")
+                with col2:
+                    st.write(f"Verification Status: {user.get('verification_status','pending')}")
+
+            # Mining Information
+            with st.expander("⛏️ Mining Information", expanded=False):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.write(f"Mining State: {user.get('mining_state','')}")
+                    st.write(f"Mining LGA: {user.get('mining_lga','')}")
+                    st.write(f"Mining Address: {user.get('mining_address','')}")
+                with col2:
+                    st.write(f"Minerals of Interest: {user.get('minerals_of_interest','')}")
+                    st.write(f"Years Experience: {user.get('years_mining_experience',0)}")
+                    st.write(f"License Number: {user.get('mining_license_number','')}")
+                with col3:
+                    st.write(f"Cooperative: {user.get('mining_cooperative','')}")
+                    st.write(f"Mining Type: {user.get('mining_type','')}")
+
+            # Bank Information
+            with st.expander("🏦 Bank Information", expanded=False):
+                st.write(f"Account Name: {user.get('account_name','')}")
+                st.write(f"Account Number: {user.get('account_number','')}")
+                st.write(f"Bank Name: {user.get('bank_name','')}")
+
+            # Emergency Contact
+            with st.expander("🚨 Emergency Contact", expanded=False):
+                st.write(f"Name: {user.get('emergency_contact_name','')}")
+                st.write(f"Phone: {user.get('emergency_contact_phone','')}")
+                st.write(f"Relationship: {user.get('emergency_relationship','')}")
+
+            # Notifications
+            with st.expander("🔔 Notification Preferences", expanded=False):
+                st.write(f"SMS: {user.get('notify_sms', True)}")
+                st.write(f"WhatsApp: {user.get('notify_whatsapp', True)}")
+                st.write(f"Weather: {user.get('notify_weather', True)}")
+                st.write(f"Disease: {user.get('notify_disease', True)}")
+                st.write(f"Payment: {user.get('notify_payment', True)}")
+                st.write(f"Language: {user.get('preferred_language','English')}")
+
+            # Account status (scans, plan, wallet)
+            st.markdown("---")
             st.write(f"**Scans Remaining:** {user.get('scans_remaining',0)}")
             st.write(f"**Plan:** {user.get('plan','free')}")
             st.write(f"**Wallet Balance:** ₦{user.get('wallet_balance',0):,.2f}")
-            status = user.get("verification_status", "pending")
-            st.write(f"**KYC Status:** {status}")
 
-            # Actions
+            # -------------------------------------------------
+            # ACTIONS
+            # -------------------------------------------------
             st.markdown("---")
-            st.subheader("Actions")
+            st.subheader("⚙️ Actions")
 
             # Add scans
             with st.form(f"add_scans_{user_id}"):
@@ -363,7 +434,6 @@ with tab5:
         payments = service.table("payment_history").select("*").order("paid_at", desc=True).limit(200).execute()
         if payments.data:
             df = pd.DataFrame(payments.data)
-            # Merge with user emails
             user_emails = {u["user_id"]: u["email"] for u in users}
             df["email"] = df["user_id"].map(user_emails)
             df["paid_at"] = pd.to_datetime(df["paid_at"]).dt.strftime("%Y-%m-%d %H:%M")
