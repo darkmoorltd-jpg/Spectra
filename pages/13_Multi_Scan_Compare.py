@@ -1,3 +1,4 @@
+from utils.sidebar import render_sidebar
 
 import streamlit as st
 import pandas as pd
@@ -7,6 +8,7 @@ from utils.style import apply_global_style
 from utils.constants import MINERALS
 
 st.set_page_config(page_title="Compare Scans", page_icon="📈", layout="wide")
+render_sidebar()
 apply_global_style()
 
 st.markdown('<h2 style="text-align:center;">📈 Multi‑Scan Comparison</h2>', unsafe_allow_html=True)

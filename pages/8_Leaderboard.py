@@ -1,9 +1,11 @@
+from utils.sidebar import render_sidebar
 
 import streamlit as st
 import pandas as pd
 from utils.style import apply_global_style
 
 st.set_page_config(page_title="Leaderboard", page_icon="🏆", layout="wide")
+render_sidebar()
 apply_global_style()
 
 st.markdown('<h2 style="text-align:center;">🏆 Top Miners This Week</h2>', unsafe_allow_html=True)

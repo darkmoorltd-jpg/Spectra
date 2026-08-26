@@ -1,3 +1,4 @@
+from utils.sidebar import render_sidebar
 
 import streamlit as st
 import pandas as pd
@@ -6,6 +7,7 @@ from utils.style import apply_global_style
 from utils.constants import MINERALS, MINERAL_PRICES
 
 st.set_page_config(page_title="Market Prices", page_icon="💹", layout="wide")
+render_sidebar()
 apply_global_style()
 
 st.markdown('<h2 style="text-align:center;">💹 Mineral Market</h2>', unsafe_allow_html=True)

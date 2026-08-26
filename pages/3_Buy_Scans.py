@@ -1,3 +1,4 @@
+from utils.sidebar import render_sidebar
 
 import streamlit as st
 import streamlit.components.v1 as components
@@ -7,6 +8,7 @@ from utils.auth import get_current_user
 from utils.paystack import PAYSTACK_PUBLIC_KEY
 
 st.set_page_config(page_title="Buy Scans", page_icon="💳", layout="wide")
+render_sidebar()
 apply_global_style()
 
 st.markdown('<h2 style="text-align:center;">💳 Buy Scans</h2>', unsafe_allow_html=True)

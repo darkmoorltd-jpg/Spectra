@@ -1,8 +1,10 @@
+from utils.sidebar import render_sidebar
 
 import streamlit as st
 from utils.style import apply_global_style
 
 st.set_page_config(page_title="Mining License Guide", page_icon="📜", layout="wide")
+render_sidebar()
 apply_global_style()
 
 st.markdown('<h2 style="text-align:center;">📜 Mining License & Permit Guide</h2>', unsafe_allow_html=True)

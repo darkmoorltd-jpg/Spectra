@@ -1,3 +1,4 @@
+from utils.sidebar import render_sidebar
 
 import streamlit as st
 import folium
@@ -5,6 +6,7 @@ from streamlit_folium import st_folium
 from utils.style import apply_global_style
 
 st.set_page_config(page_title="Exploration Map", page_icon="🗺️", layout="wide")
+render_sidebar()
 apply_global_style()
 
 st.markdown('<h2 style="text-align:center;">🗺️ Mineral Exploration Map</h2>', unsafe_allow_html=True)

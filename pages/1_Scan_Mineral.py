@@ -1,3 +1,4 @@
+from utils.sidebar import render_sidebar
 
 import streamlit as st
 from PIL import Image
@@ -17,6 +18,7 @@ from utils.pdf_report import generate_pdf_report
 from utils.extra_features import generate_qr_code, generate_blockchain_hash, overlay_heatmap, process_video_frames, record_scratch_sound, analyze_sound
 
 st.set_page_config(page_title="Scan Mineral", page_icon="🔍", layout="wide")
+render_sidebar()
 apply_global_style()
 
 st.markdown('<h2 style="text-align:center;">🔍 Mineral Scanner</h2>', unsafe_allow_html=True)

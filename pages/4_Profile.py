@@ -1,3 +1,4 @@
+from utils.sidebar import render_sidebar
 
 import streamlit as st
 from supabase import create_client
@@ -9,6 +10,7 @@ service_key = st.secrets["supabase"]["service_key"]
 service = create_client(url, service_key)
 
 st.set_page_config(page_title="My Profile", page_icon="👤", layout="wide")
+render_sidebar()
 st.markdown("<style>header,footer{visibility:hidden}</style>", unsafe_allow_html=True)
 st.title("👤 My Profile")
 
