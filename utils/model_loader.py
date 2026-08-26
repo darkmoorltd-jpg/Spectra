@@ -7,8 +7,8 @@ from PIL import Image
 from torchvision import transforms
 import timm
 
-MODEL_URL = "https://github.com/darkmoorltd-jpg/Spectra/releases/download/v1.0-384/open_set_mineral_model_384.pt"
-MODEL_PATH = "models/open_set_mineral_model_384.pt"
+MODEL_URL = "https://github.com/darkmoorltd-jpg/Spectra/releases/download/v1.0-384-full/open_set_mineral_model_384_full.pt"
+MODEL_PATH = "models/open_set_mineral_model_384_full.pt"
 
 def ensure_model():
     if not os.path.exists(MODEL_PATH) or os.path.getsize(MODEL_PATH) < 10_000_000:
