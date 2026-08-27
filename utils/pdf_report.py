@@ -1,12 +1,12 @@
 
-import os
-import io
-import tempfile
-import datetime
-from PIL import Image
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
+import io
+import datetime
+import qrcode
+from PIL import Image
 
 def generate_pdf_report(mineral, confidence, grade, value_ngn, image_bytes, scan_id):
     """Generate a PDF report with photo, QR code, and details. Returns bytes."""
@@ -31,41 +31,30 @@ def generate_pdf_report(mineral, confidence, grade, value_ngn, image_bytes, scan
     c.drawString(1*inch, height-3.3*inch, f"Date: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}")
     c.drawString(1*inch, height-3.6*inch, f"Scan ID: {scan_id}")
 
-    # Mineral Photo (if provided) using temp file
+    # Mineral Photo (if provided) — using ImageReader in memory
     if image_bytes:
-        tmp_photo = None
         try:
             img = Image.open(io.BytesIO(image_bytes))
             if img.mode != 'RGB':
                 img = img.convert('RGB')
-            tmp_photo = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg")
-            img.save(tmp_photo.name, format="JPEG")
-            c.drawImage(tmp_photo.name, width-3.2*inch, height-3.5*inch, width=2.5*inch, height=2.5*inch)
+            reader = ImageReader(img)
+            c.drawImage(reader, width-3.2*inch, height-3.5*inch, width=2.5*inch, height=2.5*inch)
         except Exception as e:
-            print(f"Could not add photo to PDF: {e}")
-        finally:
-            if tmp_photo and os.path.exists(tmp_photo.name):
-                os.unlink(tmp_photo.name)
+            print(f"Could not add photo: {e}")
 
-    # QR Code using temp file
-    tmp_qr = None
+    # QR Code — generate in memory
     try:
-        import qrcode
         qr_data = f"SPECTRA_VERIFY:{scan_id}:{mineral}:{confidence:.4f}:{grade:.4f}:{value_ngn:.2f}"
         qr = qrcode.QRCode(version=1, box_size=3, border=2)
         qr.add_data(qr_data)
         qr.make(fit=True)
         qr_img = qr.make_image(fill_color="black", back_color="white")
-        tmp_qr = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-        qr_img.save(tmp_qr.name)
-        c.drawImage(tmp_qr.name, 1*inch, height-5.8*inch, width=1.2*inch, height=1.2*inch)
+        qr_reader = ImageReader(qr_img)
+        c.drawImage(qr_reader, 1*inch, height-5.8*inch, width=1.2*inch, height=1.2*inch)
         c.setFont("Helvetica", 8)
         c.drawString(1*inch, height-6.2*inch, "Verify this report by scanning the QR code.")
     except Exception as e:
-        print(f"QR code generation failed: {e}")
-    finally:
-        if tmp_qr and os.path.exists(tmp_qr.name):
-            os.unlink(tmp_qr.name)
+        print(f"QR code failed: {e}")
 
     # Footer
     c.setFont("Helvetica", 8)
