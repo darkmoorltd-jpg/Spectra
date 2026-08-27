@@ -17,3 +17,6 @@ streamlit-webrtc
 torch
 torchvision
 timm
+
+edge-tts
+gTTS

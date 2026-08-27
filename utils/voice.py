@@ -30,8 +30,7 @@ def transcribe_audio(audio_bytes):
 
 def text_to_speech(text, language="en-GB"):
     """Convert text to speech using edge-tts (free) with fallback to gTTS.
-    Returns (audio_bytes, error_msg)."""
-    # Language mapping for edge-tts voices
+    Returns (audio_bytes, error_msg). Imports are lazy to avoid errors."""
     voices = {
         "en-GB": "en-GB-SoniaNeural",
         "en-US": "en-US-JennyNeural",
@@ -51,6 +50,7 @@ def text_to_speech(text, language="en-GB"):
     voice = voices.get(language, "en-GB-SoniaNeural")
     gtts_code = gtts_lang.get(language, "en")
 
+    # Try edge-tts (lazy import)
     try:
         import edge_tts
         async def gen():
@@ -67,14 +67,17 @@ def text_to_speech(text, language="en-GB"):
         os.unlink(audio_path)
         return audio_bytes, None
     except Exception as e:
-        try:
-            from gtts import gTTS
-            tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
-            tts = gTTS(text=text, lang=gtts_code)
-            tts.save(tmp.name)
-            with open(tmp.name, "rb") as f:
-                audio_bytes = f.read()
-            os.unlink(tmp.name)
-            return audio_bytes, None
-        except Exception as e2:
-            return None, str(e2)
+        pass
+
+    # Fallback to gTTS (lazy import)
+    try:
+        from gtts import gTTS
+        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
+        tts = gTTS(text=text, lang=gtts_code)
+        tts.save(tmp.name)
+        with open(tmp.name, "rb") as f:
+            audio_bytes = f.read()
+        os.unlink(tmp.name)
+        return audio_bytes, None
+    except Exception as e2:
+        return None, str(e2)
