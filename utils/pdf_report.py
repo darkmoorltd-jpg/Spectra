@@ -5,11 +5,10 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 import io
 import datetime
-import qrcode
 from PIL import Image
 
 def generate_pdf_report(mineral, confidence, grade, value_ngn, image_bytes, scan_id):
-    """Generate a PDF report with photo, QR code, and details. Returns bytes."""
+    """Generate a PDF report with photo and details (no QR to avoid dependency). Returns bytes."""
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
@@ -31,7 +30,7 @@ def generate_pdf_report(mineral, confidence, grade, value_ngn, image_bytes, scan
     c.drawString(1*inch, height-3.3*inch, f"Date: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}")
     c.drawString(1*inch, height-3.6*inch, f"Scan ID: {scan_id}")
 
-    # Mineral Photo (if provided) — using ImageReader in memory
+    # Mineral Photo (if provided)
     if image_bytes:
         try:
             img = Image.open(io.BytesIO(image_bytes))
@@ -42,19 +41,7 @@ def generate_pdf_report(mineral, confidence, grade, value_ngn, image_bytes, scan
         except Exception as e:
             print(f"Could not add photo: {e}")
 
-    # QR Code — generate in memory
-    try:
-        qr_data = f"SPECTRA_VERIFY:{scan_id}:{mineral}:{confidence:.4f}:{grade:.4f}:{value_ngn:.2f}"
-        qr = qrcode.QRCode(version=1, box_size=3, border=2)
-        qr.add_data(qr_data)
-        qr.make(fit=True)
-        qr_img = qr.make_image(fill_color="black", back_color="white")
-        qr_reader = ImageReader(qr_img)
-        c.drawImage(qr_reader, 1*inch, height-5.8*inch, width=1.2*inch, height=1.2*inch)
-        c.setFont("Helvetica", 8)
-        c.drawString(1*inch, height-6.2*inch, "Verify this report by scanning the QR code.")
-    except Exception as e:
-        print(f"QR code failed: {e}")
+    # No QR code to keep it simple and avoid missing dependency errors.
 
     # Footer
     c.setFont("Helvetica", 8)
