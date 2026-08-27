@@ -1,51 +1,27 @@
 
+import io
+import datetime
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
-import io
-import datetime
 from PIL import Image
 
 def generate_pdf_report(mineral, confidence, grade, value_ngn, image_bytes, scan_id):
-    """Generate a PDF report with photo and details (no QR to avoid dependency). Returns bytes."""
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
 
-    # Header
-    c.setFont("Helvetica-Bold", 24)
-    c.drawString(1*inch, height-1*inch, "SPECTRA")
+    # Simple text only – no photo, no QR
+    c.setFont("Helvetica-Bold", 20)
+    c.drawString(1*inch, height-1*inch, "SPECTRA Mineral Report")
     c.setFont("Helvetica", 12)
-    c.drawString(1*inch, height-1.3*inch, "Mineral Identification Report")
-    c.line(1*inch, height-1.5*inch, width-1*inch, height-1.5*inch)
+    c.drawString(1*inch, height-1.5*inch, f"Mineral: {mineral}")
+    c.drawString(1*inch, height-1.8*inch, f"Confidence: {confidence*100:.1f}%")
+    c.drawString(1*inch, height-2.1*inch, f"Grade: {grade*100:.0f}%")
+    c.drawString(1*inch, height-2.4*inch, f"Value: NGN {value_ngn:,.0f}")
+    c.drawString(1*inch, height-2.7*inch, f"Scan ID: {scan_id}")
+    c.drawString(1*inch, height-3.0*inch, f"Date: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}")
 
-    # Mineral Details
-    c.setFont("Helvetica-Bold", 18)
-    c.drawString(1*inch, height-2*inch, f"Mineral: {mineral}")
-    c.setFont("Helvetica", 12)
-    c.drawString(1*inch, height-2.4*inch, f"Confidence: {confidence*100:.1f}%")
-    c.drawString(1*inch, height-2.7*inch, f"Estimated Grade: {grade*100:.0f}%")
-    c.drawString(1*inch, height-3.0*inch, f"Market Value: ₦{value_ngn:,.0f}")
-    c.drawString(1*inch, height-3.3*inch, f"Date: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}")
-    c.drawString(1*inch, height-3.6*inch, f"Scan ID: {scan_id}")
-
-    # Mineral Photo (if provided)
-    if image_bytes:
-        try:
-            img = Image.open(io.BytesIO(image_bytes))
-            if img.mode != 'RGB':
-                img = img.convert('RGB')
-            reader = ImageReader(img)
-            c.drawImage(reader, width-3.2*inch, height-3.5*inch, width=2.5*inch, height=2.5*inch)
-        except Exception as e:
-            print(f"Could not add photo: {e}")
-
-    # No QR code to keep it simple and avoid missing dependency errors.
-
-    # Footer
-    c.setFont("Helvetica", 8)
-    c.drawString(1*inch, 0.5*inch, "Powered by Darkmoor Ltd")
     c.showPage()
     c.save()
     buffer.seek(0)
