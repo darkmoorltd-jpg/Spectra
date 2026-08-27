@@ -9,7 +9,7 @@ import base64
 import uuid
 from utils.style import apply_global_style
 from utils.sidebar import render_sidebar
-from utils.model_loader import load_mineral_model, predict_mineral
+from utils.model_loader import load_mineral_model, predict_mineral, estimate_grade
 from utils.deepseek import get_market_insight
 from utils.supabase_client import deduct_scan, save_scan_history
 from utils.constants import MINERALS, MINERAL_PRICES
@@ -78,7 +78,7 @@ if image_file is not None:
             else:
                 mineral = random.choice(MINERALS)
                 confidence = random.uniform(0.7, 0.98)
-                grade = random.uniform(0.2, 0.9)
+                grade = estimate_grade(image, mineral) if model is not None else 0.5
 
             my_bar = st.progress(0)
             for percent in range(0, 101, 20):
@@ -91,7 +91,7 @@ if image_file is not None:
             st.stop()
 
         if grade is None:
-            grade = random.uniform(0.2, 0.9)
+            grade = estimate_grade(image, mineral) if model is not None else 0.5
 
         price_per_kg = MINERAL_PRICES.get(mineral, 1.0)
         value_usd = price_per_kg * grade * 10

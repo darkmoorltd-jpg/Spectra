@@ -55,6 +55,32 @@ def load_mineral_model():
         print(f"Model loading failed: {e}")
         return None
 
+
+def estimate_grade(image: Image.Image, mineral: str) -> float:
+    """Estimate ore grade based on simple visual heuristics.
+    Returns a grade value between 0.1 and 0.9."""
+    import numpy as np
+    arr = np.array(image.convert("RGB"))
+    # Compute average colour intensity and variation
+    brightness = arr.mean() / 255.0
+    saturation = (arr.max(axis=2) - arr.min(axis=2)).mean() / 255.0
+
+    # Mineral-specific heuristics (approximate)
+    if mineral == "Pyrite":
+        # Pyrite is bright and metallic
+        grade = 0.3 + (brightness * 0.4) + (saturation * 0.1)
+    elif mineral in ["Malachite", "Chrysocolla", "Bornite"]:
+        # Copper minerals often show vivid colours
+        grade = 0.2 + (saturation * 0.6) + (brightness * 0.2)
+    elif mineral == "Quartz":
+        # Quartz grade for gold-bearing quartz is lower unless visible gold
+        grade = 0.1 + (brightness * 0.2) + (saturation * 0.3)
+    else:
+        grade = 0.2 + (brightness * 0.3) + (saturation * 0.4)
+
+    # Clip to reasonable range
+    grade = max(0.1, min(0.9, grade))
+    return grade
 def predict_mineral(model_dict, image: Image.Image):
     if model_dict is None:
         return "Unknown", 0.0, 0.0
