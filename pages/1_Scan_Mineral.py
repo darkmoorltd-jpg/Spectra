@@ -13,7 +13,7 @@ from utils.model_loader import load_mineral_model, predict_mineral
 from utils.deepseek import get_market_insight
 from utils.supabase_client import deduct_scan, save_scan_history
 from utils.constants import MINERALS, MINERAL_PRICES
-from utils.voice import transcribe_audio
+from utils.voice import transcribe_audio, text_to_speech
 from utils.pdf_report import generate_pdf_report
 from utils.threejs_viewer import render_3d_mineral
 from utils.extra_features import generate_qr_code, generate_blockchain_hash, overlay_heatmap, process_video_frames, record_scratch_sound, analyze_sound
