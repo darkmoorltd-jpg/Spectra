@@ -1,12 +1,12 @@
 
+import os
+import io
+import tempfile
+import datetime
+from PIL import Image
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
-import io
-import datetime
-import tempfile
-import os
-from PIL import Image
 
 def generate_pdf_report(mineral, confidence, grade, value_ngn, image_bytes, scan_id):
     """Generate a PDF report with photo, QR code, and details. Returns bytes."""
