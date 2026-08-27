@@ -1,42 +1,44 @@
-from utils.sidebar import render_sidebar
 
 import streamlit as st
 import pandas as pd
-from utils.style import apply_global_style, badge
+from utils.style import apply_global_style
+from utils.sidebar import render_sidebar
 from utils.auth import get_current_user
+from supabase import create_client
 
 st.set_page_config(page_title="My Vault", page_icon="📊", layout="wide")
-render_sidebar()
 apply_global_style()
+render_sidebar()
 
 st.markdown('<h2 style="text-align:center;">💎 My Vault</h2>', unsafe_allow_html=True)
+
 user = get_current_user()
 if user is None:
-    st.warning("Please login to view your vault.")
+    st.warning("Please log in to view your history.")
 else:
-    # Placeholder data
-    st.info("Full scan history will be stored in Supabase.")
-    data = {
-        "Date": ["2025-01-15", "2025-01-14", "2025-01-13"],
-        "Mineral": ["Gold", "Cassiterite", "Coltan"],
-        "Confidence": [94.2, 88.7, 91.5],
-        "Grade": ["72%", "55%", "63%"],
-        "Value": ["₦450,000", "₦220,000", "₦380,000"]
-    }
-    df = pd.DataFrame(data)
-    # Filters
-    col1, col2 = st.columns(2)
-    with col1:
-        mineral_filter = st.selectbox("Filter by Mineral", ["All"] + list(df["Mineral"].unique()))
-    with col2:
-        date_filter = st.selectbox("Sort", ["Newest", "Oldest"])
-    filtered = df if mineral_filter == "All" else df[df["Mineral"] == mineral_filter]
-    st.dataframe(filtered, use_container_width=True)
+    # Use service role to query scan_history
+    url = st.secrets["supabase"]["url"]
+    service_key = st.secrets["supabase"]["service_key"]
+    service = create_client(url, service_key)
 
-    # Achievements
-    st.markdown("---")
-    st.subheader("🏆 Badges Earned")
-    col1, col2, col3 = st.columns(3)
-    with col1: badge("🔬 First Scan")
-    with col2: badge("🥇 Gold Hunter")
-    with col3: badge("⛏️ Pro Miner")
+    try:
+        res = service.table("scan_history") \
+            .select("id, mineral, confidence, grade, value_ngn, created_at") \
+            .eq("user_id", user.id) \
+            .order("created_at", desc=True) \
+            .limit(100) \
+            .execute()
+        if res.data:
+            df = pd.DataFrame(res.data)
+            # Format columns
+            df["confidence"] = df["confidence"].apply(lambda x: f"{x*100:.1f}%")
+            df["grade"] = df["grade"].apply(lambda x: f"{x*100:.0f}%" if x is not None else "N/A")
+            df["value_ngn"] = df["value_ngn"].apply(lambda x: f"₦{x:,.0f}" if x is not None else "N/A")
+            df["created_at"] = pd.to_datetime(df["created_at"]).dt.strftime("%Y-%m-%d %H:%M")
+            df = df[["created_at", "mineral", "confidence", "grade", "value_ngn"]]
+            df.columns = ["Date", "Mineral", "Confidence", "Grade", "Value"]
+            st.dataframe(df, use_container_width=True)
+        else:
+            st.info("No scans yet. Go to Scan Mineral to start your collection.")
+    except Exception as e:
+        st.error(f"Failed to load history: {e}")

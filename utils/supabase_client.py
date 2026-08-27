@@ -44,6 +44,23 @@ def add_scans_to_user(user_id: str, amount: int) -> int:
     client.table("user_scans").update({"scans_remaining": new_total}).eq("user_id", user_id).execute()
     return new_total
 
+
+def save_scan_history(user_id: str, mineral: str, confidence: float, grade: float, value_ngn: float):
+    """Insert a new scan record into scan_history."""
+    client = get_service_client()
+    try:
+        client.table("scan_history").insert({
+            "user_id": user_id,
+            "mineral": mineral,
+            "confidence": confidence,
+            "grade": grade,
+            "value_ngn": value_ngn,
+            "created_at": "now()"
+        }).execute()
+        return True
+    except Exception as e:
+        print(f"Failed to save scan history: {e}")
+        return False
 def save_payment_record(user_id: str, amount: float, scans_added: int, plan: str, reference: str):
     """Insert payment history row."""
     client = get_service_client()

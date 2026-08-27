@@ -11,7 +11,7 @@ import uuid
 from utils.style import apply_global_style
 from utils.model_loader import load_mineral_model, predict_mineral
 from utils.deepseek import get_market_insight
-from utils.supabase_client import deduct_scan
+from utils.supabase_client import deduct_scan, save_scan_history
 from utils.constants import MINERALS, MINERAL_PRICES
 from utils.voice import transcribe_audio
 from utils.pdf_report import generate_pdf_report
@@ -114,6 +114,11 @@ if image_file is not None:
         price_per_kg = MINERAL_PRICES.get(mineral, 1.0)
         value_usd = price_per_kg * grade * 10
         value_ngn = value_usd * 1500
+
+        # Save scan history to database
+        if user is not None:
+            save_scan_history(user.id, mineral, confidence, grade, value_ngn)
+
 
         # Heatmap overlay (simulated)
         heatmap_img = overlay_heatmap(image, grade, mineral)
