@@ -197,14 +197,7 @@ if image_file is not None:
             if st.button("Voice Explanation"):
                 st.audio(b"", format="audio/mp3")
         with col4:
-            pdf_bytes = generate_pdf_report(mineral, confidence, grade, value_ngn, image_file.getvalue(), scan_id)
-            st.download_button(
-                label="📄 Download PDF",
-                data=pdf_bytes,
-                file_name=f"SPECTRA_report_{mineral}_{scan_id}.pdf",
-                mime="application/pdf",
-                use_container_width=True
-            )
+            st.caption("📄 PDF coming soon")
 
 elif video_file is not None:
     st.video(video_file)
