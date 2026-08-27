@@ -160,8 +160,4 @@ if image_file is not None:
 
 elif video_file is not None:
     st.video(video_file)
-    if st.button("Analyze Video"):
-        frames = process_video_frames(video_file, num_frames=5)
-        st.success(f"Extracted {len(frames)} frames")
-        for i, frame in enumerate(frames):
-            st.image(frame, caption=f"Frame {i+1}", width=200)
+    st.info("Video analysis coming soon. Please use photo upload for now.")
