@@ -33,16 +33,17 @@ model = get_model()
 if model is None:
     st.warning("⚠️ Real model unavailable – using demo predictions.")
 
-# Voice command
+# Voice command (simplified)
 if st.button("🎤 Voice Command"):
-    audio = st.audio_input("Speak now")
-    if audio:
+    st.info("Click the microphone below to record your command (max 10 seconds).")
+    audio = st.audio_input("Record your voice command")
+    if audio is not None:
         with st.spinner("Transcribing..."):
             text, err = transcribe_audio(audio.getvalue())
         if err:
-            st.error(err)
+            st.warning(f"Could not transcribe: {err}")
         else:
-            st.success(f"You said: {text}")
+            st.success(f"You said: "{text}"")
             if any(word in text.lower() for word in ["scan", "identify", "what is"]):
                 st.info("Please upload a photo or use camera.")
 
