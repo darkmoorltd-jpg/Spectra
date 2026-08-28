@@ -16,7 +16,9 @@ from utils.constants import MINERALS, MINERAL_PRICES
 from utils.voice import transcribe_audio, text_to_speech
 from utils.threejs_viewer import render_3d_mineral
 from utils.extra_features import overlay_heatmap, process_video_frames, record_scratch_sound, analyze_sound
+from utils.session import init_session
 
+init_session()
 st.set_page_config(page_title="Scan Mineral", page_icon="🔍", layout="wide")
 apply_global_style()
 render_sidebar()

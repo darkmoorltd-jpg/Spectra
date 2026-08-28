@@ -5,7 +5,9 @@ from utils.style import apply_global_style
 from utils.auth import get_current_user
 from utils.price_alerts import add_price_alert, get_user_alerts
 from utils.constants import MINERALS
+from utils.session import init_session
 
+init_session()
 st.set_page_config(page_title="Price Alerts", page_icon="🔔", layout="wide")
 render_sidebar()
 apply_global_style()

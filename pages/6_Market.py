@@ -5,7 +5,9 @@ import pandas as pd
 import plotly.express as px
 from utils.style import apply_global_style
 from utils.constants import MINERALS, MINERAL_PRICES
+from utils.session import init_session
 
+init_session()
 st.set_page_config(page_title="Market Prices", page_icon="💹", layout="wide")
 render_sidebar()
 apply_global_style()

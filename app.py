@@ -4,7 +4,9 @@ from utils.style import apply_global_style, metric_box
 from utils.auth import sign_up, sign_in, sign_out, get_current_user
 from utils.constants import MINERALS
 from utils.gamification import update_streak, get_leaderboard
+from utils.session import init_session
 
+init_session()
 st.set_page_config(page_title="SPECTRA", page_icon="⛏️", layout="wide")
 
 # Custom skin selection (persist in session)

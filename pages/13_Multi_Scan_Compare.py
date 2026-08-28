@@ -6,7 +6,9 @@ from PIL import Image
 import random
 from utils.style import apply_global_style
 from utils.constants import MINERALS
+from utils.session import init_session
 
+init_session()
 st.set_page_config(page_title="Compare Scans", page_icon="📈", layout="wide")
 render_sidebar()
 apply_global_style()

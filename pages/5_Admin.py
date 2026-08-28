@@ -5,12 +5,14 @@ import pandas as pd
 from supabase import create_client, Client
 from datetime import datetime
 import time
+from utils.session import init_session
 
 # Supabase setup
 url = st.secrets["supabase"]["url"]
 service_key = st.secrets["supabase"]["service_key"]
 service = create_client(url, service_key)
 
+init_session()
 st.set_page_config(page_title="Admin Dashboard", page_icon="🔐", layout="wide")
 render_sidebar()
 st.markdown("<style>header,footer{visibility:hidden}</style>", unsafe_allow_html=True)

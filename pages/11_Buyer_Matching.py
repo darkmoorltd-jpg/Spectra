@@ -4,7 +4,9 @@ import streamlit as st
 from utils.style import apply_global_style
 from utils.buyer_matching import get_buyers_for_mineral
 from utils.constants import MINERALS
+from utils.session import init_session
 
+init_session()
 st.set_page_config(page_title="Find Buyers", page_icon="🤝", layout="wide")
 render_sidebar()
 apply_global_style()

@@ -3,7 +3,9 @@ import streamlit as st
 from utils.style import apply_global_style
 from utils.sidebar import render_sidebar
 from utils.extra_features import record_scratch_sound, analyze_sound
+from utils.session import init_session
 
+init_session()
 st.set_page_config(page_title="Sound Analysis", page_icon="🔊", layout="wide")
 apply_global_style()
 render_sidebar()

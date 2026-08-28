@@ -5,7 +5,9 @@ from utils.style import apply_global_style
 from utils.sidebar import render_sidebar
 from utils.auth import get_current_user
 from supabase import create_client
+from utils.session import init_session
 
+init_session()
 st.set_page_config(page_title="My Vault", page_icon="📊", layout="wide")
 apply_global_style()
 render_sidebar()

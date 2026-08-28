@@ -2,7 +2,9 @@ from utils.sidebar import render_sidebar
 
 import streamlit as st
 from utils.style import apply_global_style
+from utils.session import init_session
 
+init_session()
 st.set_page_config(page_title="Mining License Guide", page_icon="📜", layout="wide")
 render_sidebar()
 apply_global_style()

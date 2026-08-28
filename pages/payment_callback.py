@@ -3,7 +3,9 @@ import streamlit as st
 from utils.auth import get_current_user
 from utils.paystack import verify_payment
 from utils.supabase_client import add_scans_to_user, save_payment_record
+from utils.session import init_session
 
+init_session()
 st.set_page_config(page_title="Payment Verification", page_icon="⏳", layout="centered")
 
 st.title("⏳ Processing your payment...")

@@ -6,7 +6,9 @@ from utils.style import apply_global_style
 from utils.sidebar import render_sidebar
 from utils.auth import get_current_user
 from utils.paystack import PAYSTACK_PUBLIC_KEY
+from utils.session import init_session
 
+init_session()
 st.set_page_config(page_title="Buy Scans", page_icon="💳", layout="wide")
 apply_global_style()
 render_sidebar()

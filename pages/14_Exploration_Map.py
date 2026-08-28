@@ -4,7 +4,9 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 from utils.style import apply_global_style
+from utils.session import init_session
 
+init_session()
 st.set_page_config(page_title="Exploration Map", page_icon="🗺️", layout="wide")
 render_sidebar()
 apply_global_style()
