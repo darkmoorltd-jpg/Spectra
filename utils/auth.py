@@ -1,6 +1,7 @@
 
 import streamlit as st
 from supabase import create_client, Client
+from utils.persistent_session import save_session_to_local_storage
 
 def get_supabase():
     url = st.secrets["supabase"]["url"]
@@ -29,6 +30,7 @@ def sign_up(email, password, first_name="", last_name=""):
                 "first_name": first_name,
                 "last_name": last_name
             }).execute()
+            save_session_to_local_storage(res.user.email, res.session.access_token)
             return res.user, None
         else:
             return None, "Signup failed"
@@ -41,6 +43,7 @@ def sign_in(email, password):
     try:
         res = client.auth.sign_in_with_password({"email": email, "password": password})
         if res.user:
+            save_session_to_local_storage(res.user.email, res.session.access_token)
             return res.user, None
         else:
             return None, "Login failed"
