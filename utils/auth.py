@@ -18,7 +18,6 @@ def sign_up(email, password, first_name="", last_name=""):
     try:
         res = client.auth.sign_up({"email": email, "password": password})
         if res.user:
-            # Use service client to insert rows (bypass RLS)
             service = get_service_client()
             service.table("user_scans").insert({
                 "user_id": res.user.id,
@@ -58,5 +57,17 @@ def sign_out():
         pass
 
 def get_current_user():
-    """Return user from session state or None."""
-    return st.session_state.get("user", None)
+    """Return user from session state, or try to recover from Supabase session."""
+    if "user" in st.session_state and st.session_state.user is not None:
+        return st.session_state.user
+
+    # Try to get session from Supabase (persists across refresh)
+    try:
+        client = get_supabase()
+        session = client.auth.get_session()
+        if session and session.user:
+            st.session_state.user = session.user
+            return session.user
+    except:
+        pass
+    return None
