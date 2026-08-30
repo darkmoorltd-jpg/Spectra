@@ -39,7 +39,7 @@ def render_sidebar():
                 
                 # Account credentials
                 email = st.text_input("Email *", key="su_email")
-                password = st.text_input("Password *", type="password", key="su_password", min_chars=6)
+                password = st.text_input("Password *", type="password", key="su_password")
                 confirm_password = st.text_input("Confirm Password *", type="password", key="su_confirm")
                 
                 st.markdown("---")
@@ -104,7 +104,9 @@ def render_sidebar():
                 
                 if st.button("⛏️ Create Account", key="sidebar_signup_btn", use_container_width=True):
                     # Validate
-                    if password != confirm_password:
+                    if len(password) < 6:
+                        st.error("❌ Password must be at least 6 characters.")
+                    elif password != confirm_password:
                         st.error("❌ Passwords do not match.")
                     elif not all([email, password, first_name, last_name, gender, date_of_birth, marital_status, phone, whatsapp, country, state, lga, city, street, landmark, postal, bvn, nin, id_type, id_number, mining_state, mining_lga, mining_address, minerals, license_num, cooperative, mining_type, account_name, account_number, bank_name, em_name, em_relation, em_phone]):
                         st.error("❌ All fields are required except Middle Name.")
