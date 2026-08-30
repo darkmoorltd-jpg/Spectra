@@ -16,7 +16,6 @@ PAYSTACK_SECRET = st.secrets["paystack"]["secret_key"]
 
 
 def normalize_phone(phone):
-    """Convert Nigerian phone to international format."""
     if not phone:
         return "08000000000"
     phone = phone.strip().replace(" ", "").replace("-", "").replace("+", "")
@@ -48,7 +47,6 @@ user = st.session_state.user
 supabase = init_supabase()
 service = init_service()
 
-# Fetch user phone
 user_phone = ""
 try:
     profile_res = service.table("user_profiles").select("phone").eq("user_id", user.id).execute()
@@ -59,15 +57,12 @@ except:
 
 phone_for_sms = normalize_phone(user_phone)
 
-# Custom dark theme
 st.markdown("""
 <style>
     .stApp { background: radial-gradient(ellipse at 20% 50%, #0d1b2a 0%, #0a0e17 70%); color: #e0e0e0; }
     header, footer { visibility: hidden; }
     .title { font-size: 2.5rem; font-weight: 800; text-align: center; color: #ffd700; }
     .subtitle { text-align: center; color: #8892b0; margin-bottom: 2rem; }
-    .card { background: #111827; border: 1px solid #1f2a44; border-radius: 16px; padding: 1.5rem; margin: 1rem 0; }
-    .stButton > button { background: #ffd700; color: #0a0e17; font-weight: bold; border: none; border-radius: 8px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -87,6 +82,26 @@ try:
             st.stop()
 except:
     pass
+
+# Function to upload file to Supabase Storage and return public URL
+def upload_to_storage(file_bytes, file_name, bucket_name="miner-documents"):
+    """Upload file to Supabase Storage and return public URL."""
+    try:
+        # Ensure bucket exists
+        try:
+            service.storage.create_bucket(bucket_name, {"public": True})
+        except:
+            pass
+        
+        # Upload file
+        res = service.storage.from_(bucket_name).upload(
+            file_name, file_bytes, {"content-type": "image/jpeg"}
+        )
+        # Get public URL
+        public_url = service.storage.from_(bucket_name).get_public_url(file_name)
+        return public_url, None
+    except Exception as e:
+        return None, str(e)
 
 with st.form("miner_verification_form"):
     st.markdown("### 📋 Personal Information")
@@ -118,16 +133,37 @@ if submit:
     if not full_name or not phone or not state or not mining_site or not id_upload or not selfie_upload:
         st.error("❌ Please fill all required fields and upload ID + selfie.")
     else:
-        # Create verification record
+        # Upload documents to Supabase Storage
         verification_ref = f"SPECTRA_VERIFY_{user.id[:8]}_{uuid.uuid4().hex[:8]}"
+        
+        # Upload ID
+        id_file_name = f"{user.id}/id_{verification_ref}.jpg"
+        id_bytes = id_upload.getvalue()
+        id_url, id_err = upload_to_storage(id_bytes, id_file_name)
+        
+        # Upload selfie
+        selfie_file_name = f"{user.id}/selfie_{verification_ref}.jpg"
+        selfie_bytes = selfie_upload.getvalue()
+        selfie_url, selfie_err = upload_to_storage(selfie_bytes, selfie_file_name)
+        
+        if id_err or selfie_err:
+            st.error(f"Upload error: {id_err or selfie_err}")
+            st.stop()
+        
+        # Create verification record with document URLs
         service.table("miner_verifications").insert({
             "user_id": user.id,
             "full_name": full_name,
             "phone": phone,
+            "email": user.email,
             "state": state,
             "lga": lga,
             "mining_site": mining_site,
             "minerals": minerals,
+            "id_type": id_type,
+            "id_number": id_number,
+            "id_upload_url": id_url,
+            "selfie_upload_url": selfie_url,
             "payment_reference": verification_ref,
             "payment_status": "pending",
             "status": "pending",
