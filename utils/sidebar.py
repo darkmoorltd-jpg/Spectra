@@ -175,6 +175,37 @@ def render_sidebar():
         
         else:
             st.write(f"Logged in as: **{user.email}**")
+            
+            # Fetch and display remaining scans
+            try:
+                url = st.secrets["supabase"]["url"]
+                key = st.secrets["supabase"]["service_key"]
+                service = create_client(url, key)
+                scans_res = service.table("user_scans").select("scans_remaining").eq("user_id", user.id).execute()
+                if scans_res.data and len(scans_res.data) > 0:
+                    scans_left = scans_res.data[0].get("scans_remaining", 0)
+                else:
+                    scans_left = 30
+            except:
+                scans_left = 30
+            
+            # Display scans in a nice box
+            st.markdown(f"""
+            <div style="background:#0D1B2A; border:1px solid #FFD700; border-radius:12px; padding:1rem; text-align:center; margin:0.5rem 0;">
+                <div style="font-size:2rem; font-weight:900; color:#FFD700;">{scans_left}</div>
+                <div style="font-size:0.8rem; color:#8892B0; letter-spacing:1px;">SCANS REMAINING</div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Quick action buttons
+            st.markdown("### ⚡ Quick Actions")
+            st.page_link("pages/1_Scan_Mineral.py", label="🔍 Scan Mineral", use_container_width=True)
+            st.page_link("pages/3_Buy_Scans.py", label="💳 Buy Scans", use_container_width=True)
+            st.page_link("pages/4_Profile.py", label="👤 Profile", use_container_width=True)
+            st.page_link("pages/2_My_History.py", label="📊 My Vault", use_container_width=True)
+            
+            st.markdown("---")
+            
             if st.button("Logout", key="sidebar_logout_btn", use_container_width=True):
                 try:
                     url = st.secrets["supabase"]["url"]
