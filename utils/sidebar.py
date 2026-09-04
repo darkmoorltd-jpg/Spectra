@@ -197,12 +197,23 @@ def render_sidebar():
             </div>
             """, unsafe_allow_html=True)
             
-            # Quick action buttons
+            # Quick action buttons - Grouped
             st.markdown("### ⚡ Quick Actions")
+            
+            # Miner Tools
+            st.markdown("**⛏️ Miner Tools**")
             st.page_link("pages/1_Scan_Mineral.py", label="🔍 Scan Mineral", use_container_width=True)
             st.page_link("pages/3_Buy_Scans.py", label="💳 Buy Scans", use_container_width=True)
             st.page_link("pages/4_Profile.py", label="👤 Profile", use_container_width=True)
             st.page_link("pages/2_My_History.py", label="📊 My Vault", use_container_width=True)
+            st.page_link("pages/6_Verify_Miner.py", label="🛡️ Miner Verification", use_container_width=True)
+            
+            st.markdown("---")
+            
+            # Admin Tools (only show for admin)
+            st.markdown("**🔐 Admin Tools**")
+            st.page_link("pages/5_Admin.py", label="👥 Admin Dashboard", use_container_width=True)
+            st.page_link("pages/7_Admin_Miner_Verification.py", label="✅ Admin Verification", use_container_width=True)
             
             st.markdown("---")
             
