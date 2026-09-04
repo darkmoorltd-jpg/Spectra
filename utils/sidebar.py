@@ -211,11 +211,12 @@ def render_sidebar():
             st.markdown("---")
             
             # Admin Tools (only show for admin)
-            st.markdown("**🔐 Admin Tools**")
-            st.page_link("pages/5_Admin.py", label="👥 Admin Dashboard", use_container_width=True)
-            st.page_link("pages/7_Admin_Miner_Verification.py", label="✅ Admin Verification", use_container_width=True)
-            
-            st.markdown("---")
+            if user.email == "darkmoorltd@gmail.com":
+                st.markdown("**🔐 Admin Tools**")
+                st.page_link("pages/5_Admin.py", label="👥 Admin Dashboard", use_container_width=True)
+                st.page_link("pages/7_Admin_Miner_Verification.py", label="✅ Admin Verification", use_container_width=True)
+                
+                st.markdown("---")
             
             if st.button("Logout", key="sidebar_logout_btn", use_container_width=True):
                 try:
