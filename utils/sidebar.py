@@ -186,16 +186,3 @@ def render_sidebar():
                 st.session_state.user = None
                 st.rerun()
         
-        st.markdown("---")
-        st.markdown("### 🚀 Quick Navigation")
-        pages = [
-            ("🏠 Home", "/"),
-            ("🔍 Scan Mineral", "/Scan_Mineral"),
-            ("📊 My Vault", "/My_History"),
-            ("💹 Market Prices", "/Market"),
-            ("💳 Buy Scans", "/Buy_Scans"),
-            ("👤 Profile", "/Profile"),
-            ("📚 Mineralpedia", "/Mineralpedia"),
-        ]
-        for label, path in pages:
-            st.markdown(f"[{label}]({path})")
