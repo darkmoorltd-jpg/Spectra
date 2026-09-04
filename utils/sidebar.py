@@ -190,12 +190,32 @@ def render_sidebar():
                 scans_left = 30
             
             # Display scans in a nice box
-            st.markdown(f"""
-            <div style="background:#0D1B2A; border:1px solid #FFD700; border-radius:12px; padding:1rem; text-align:center; margin:0.5rem 0;">
-                <div style="font-size:2rem; font-weight:900; color:#FFD700;">{scans_left}</div>
-                <div style="font-size:0.8rem; color:#8892B0; letter-spacing:1px;">SCANS REMAINING</div>
-            </div>
-            """, unsafe_allow_html=True)
+            if scans_left <= 0:
+                # No scans left - show warning
+                st.markdown(f"""
+                <div style="background:#1A0A0A; border:2px solid #FF1744; border-radius:12px; padding:1rem; text-align:center; margin:0.5rem 0;">
+                    <div style="font-size:2rem; font-weight:900; color:#FF1744;">0</div>
+                    <div style="font-size:0.8rem; color:#FF1744; letter-spacing:1px;">NO SCANS LEFT</div>
+                    <div style="font-size:0.7rem; color:#8892B0; margin-top:5px;">Buy more to continue scanning</div>
+                </div>
+                """, unsafe_allow_html=True)
+                st.warning("⚠️ You have no scans left. Buy more to continue.")
+            elif scans_left <= 5:
+                # Low scans warning
+                st.markdown(f"""
+                <div style="background:#1A1400; border:2px solid #FF8C00; border-radius:12px; padding:1rem; text-align:center; margin:0.5rem 0;">
+                    <div style="font-size:2rem; font-weight:900; color:#FF8C00;">{scans_left}</div>
+                    <div style="font-size:0.8rem; color:#FF8C00; letter-spacing:1px;">SCANS REMAINING</div>
+                    <div style="font-size:0.7rem; color:#8892B0; margin-top:5px;">Running low - buy more soon</div>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div style="background:#0D1B2A; border:1px solid #FFD700; border-radius:12px; padding:1rem; text-align:center; margin:0.5rem 0;">
+                    <div style="font-size:2rem; font-weight:900; color:#FFD700;">{scans_left}</div>
+                    <div style="font-size:0.8rem; color:#8892B0; letter-spacing:1px;">SCANS REMAINING</div>
+                </div>
+                """, unsafe_allow_html=True)
             
             # Quick action buttons - Grouped
             st.markdown("### ⚡ Quick Actions")
