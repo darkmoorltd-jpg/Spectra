@@ -70,6 +70,11 @@ if image_file is not None:
             st.warning("Please log in to scan. (Demo scan without deduction)")
         else:
             new_total = deduct_scan(user.id)
+            if new_total <= 0:
+                st.error("❌ You have no scans left!")
+                st.markdown("### 💳 Buy More Scans")
+                st.page_link("pages/3_Buy_Scans.py", label="Go to Buy Scans", use_container_width=True)
+                st.stop()
             if new_total < 0:
                 st.error("Not enough scans. Buy more.")
                 st.stop()
