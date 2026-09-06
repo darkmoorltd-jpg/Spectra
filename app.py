@@ -314,21 +314,30 @@ for scan in recent_scans:
 st.markdown("---")
 st.markdown("### 🚀 Quick Access")
 
-pages = [
-    ("🔍 Scan Mineral", "pages/1_Scan_Mineral.py"),
-    ("📊 My Vault", "pages/2_My_History.py"),
-    ("💹 Market Prices", "pages/6_Market.py"),
-    ("💳 Buy Scans", "pages/3_Buy_Scans.py"),
-    ("👤 Profile", "pages/4_Profile.py"),
-    ("📚 Mineralpedia", "pages/7_Mineralpedia.py"),
-    ("🏆 Leaderboard", "pages/8_Leaderboard.py"),
-    ("🔗 Referral", "pages/9_Referral.py"),
-]
+# Safe navigation using markdown links (no page_link errors)
+st.markdown("### 🔗 Quick Navigation")
+col1, col2, col3, col4 = st.columns(4)
 
-cols = st.columns(4)
-for i, (label, page_path) in enumerate(pages):
-    with cols[i % 4]:
-        st.page_link(page_path, label=label, use_container_width=True)
+with col1:
+    st.markdown("**Core Features**")
+    st.markdown("[🔍 Scan Mineral](/Scan_Mineral)")
+    st.markdown("[📊 My Vault](/My_History)")
+    st.markdown("[💳 Buy Scans](/Buy_Scans)")
+
+with col2:
+    st.markdown("**Market**")
+    st.markdown("[💹 Market Prices](/Market)")
+    st.markdown("[📚 Mineralpedia](/Mineralpedia)")
+    st.markdown("[🏆 Leaderboard](/Leaderboard)")
+
+with col3:
+    st.markdown("**Account**")
+    st.markdown("[👤 Profile](/Profile)")
+    st.markdown("[🔗 Referral](/Referral)")
+
+with col4:
+    st.markdown("**Admin**")
+    st.markdown("[🔐 Admin](/Admin)")
 
 # ============================================
 # FOOTER
