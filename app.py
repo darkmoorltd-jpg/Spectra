@@ -315,29 +315,7 @@ st.markdown("---")
 st.markdown("### 🚀 Quick Access")
 
 # Safe navigation using markdown links (no page_link errors)
-st.markdown("### 🔗 Quick Navigation")
-col1, col2, col3, col4 = st.columns(4)
 
-with col1:
-    st.markdown("**Core Features**")
-    st.markdown("[🔍 Scan Mineral](/Scan_Mineral)")
-    st.markdown("[📊 My Vault](/My_History)")
-    st.markdown("[💳 Buy Scans](/Buy_Scans)")
-
-with col2:
-    st.markdown("**Market**")
-    st.markdown("[💹 Market Prices](/Market)")
-    st.markdown("[📚 Mineralpedia](/Mineralpedia)")
-    st.markdown("[🏆 Leaderboard](/Leaderboard)")
-
-with col3:
-    st.markdown("**Account**")
-    st.markdown("[👤 Profile](/Profile)")
-    st.markdown("[🔗 Referral](/Referral)")
-
-with col4:
-    st.markdown("**Admin**")
-    st.markdown("[🔐 Admin](/Admin)")
 
 # ============================================
 # FOOTER
